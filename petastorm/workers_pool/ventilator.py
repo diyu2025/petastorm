@@ -145,6 +145,7 @@ class ConcurrentVentilator(Ventilator):
             # If we are ventilating the first item, we check if we would like to randomize the item order
             if self._current_item_to_ventilate == 0 and self._randomize_item_order and not self._shuffled_this_iteration:
                 self._random_state.shuffle(self._items_to_ventilate)
+                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time aft Shuffling {self._items_to_ventilate}")
                 self._shuffled_this_iteration = True
 
             # Block until queue has room, but use continue to allow for checking if stop has been called
