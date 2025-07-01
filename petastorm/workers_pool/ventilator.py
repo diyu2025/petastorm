@@ -110,6 +110,7 @@ class ConcurrentVentilator(Ventilator):
         self._ventilated_items_count = 0
         self._processed_items_count = 0
         self._stop_requested = False
+        self._shuffled_this_iteration = False  # Track if shuffling has already happened for current iteration
 
     def start(self):
         # Start the ventilation thread
@@ -142,8 +143,9 @@ class ConcurrentVentilator(Ventilator):
                 break
 
             # If we are ventilating the first item, we check if we would like to randomize the item order
-            if self._current_item_to_ventilate == 0 and self._randomize_item_order:
+            if self._current_item_to_ventilate == 0 and self._randomize_item_order and not self._shuffled_this_iteration:
                 self._random_state.shuffle(self._items_to_ventilate)
+                self._shuffled_this_iteration = True
 
             # Block until queue has room, but use continue to allow for checking if stop has been called
             if self._ventilated_items_count - self._processed_items_count >= self._max_ventilation_queue_size:
@@ -157,6 +159,7 @@ class ConcurrentVentilator(Ventilator):
 
             if self._current_item_to_ventilate >= len(self._items_to_ventilate):
                 self._current_item_to_ventilate = 0
+                self._shuffled_this_iteration = False
                 # If iterations was set to None, that means we will iterate until stop is called
                 if self._iterations_remaining is not None:
                     self._iterations_remaining -= 1
