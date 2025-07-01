@@ -99,6 +99,8 @@ class ConcurrentVentilator(Ventilator):
         self._iterations_remaining = iterations
         self._randomize_item_order = randomize_item_order
         self._random_state = np.random.RandomState(seed=random_seed)
+        self._random_state2 = np.random.RandomState(seed=random_seed)
+        self._test_array = [i for i in range(len(items_to_ventilate))]
         self._iterations = iterations
 
         # For the default max ventilation queue size we will use the size of the items to ventilate
@@ -144,8 +146,10 @@ class ConcurrentVentilator(Ventilator):
 
             # If we are ventilating the first item, we check if we would like to randomize the item order
             if self._current_item_to_ventilate == 0 and self._randomize_item_order and not self._shuffled_this_iteration:
+                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time b4 Shuffling {self._items_to_ventilate} self._test_array:{self._test_array}")
                 self._random_state.shuffle(self._items_to_ventilate)
-                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time aft Shuffling {self._items_to_ventilate}")
+                self._random_state2.shuffle(self._test_array)
+                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time aft Shuffling {self._items_to_ventilate} self._test_array:{self._test_array}")
                 self._shuffled_this_iteration = True
 
             # Block until queue has room, but use continue to allow for checking if stop has been called
