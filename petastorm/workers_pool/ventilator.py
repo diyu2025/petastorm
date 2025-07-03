@@ -99,12 +99,19 @@ class ConcurrentVentilator(Ventilator):
 
         # Define a fixed seed value
         seed = random_seed
-
+        print(f"petastorm ConcurrentVentilator __init__ seed:{seed}")
+        seed = 42
         # On each node, initialize the SeedSequence with the same seed
         ss = SeedSequence(seed)
 
+
         # Create a random number generator using the SeedSequence
         rng = default_rng(ss)
+
+        import random
+        random.seed (42)
+        python_random_array =  [random.randint(0, 10) for _ in range(130)]
+        print(f"petastorm ConcurrentVentilator __init__ python_random_array:{python_random_array}")
 
         # # Generate a permutation
         # data = [0, 1, 2, 3, 4, 5, 6]
@@ -193,3 +200,16 @@ class ConcurrentVentilator(Ventilator):
         if self._ventilation_thread:
             self._ventilation_thread.join()
             self._ventilation_thread = None
+
+
+# from numpy.random import SeedSequence, default_rng
+# # Define a fixed seed value
+# seed = 42
+# print(f"petastorm ConcurrentVentilator __init__ seed:{seed}")
+# # On each node, initialize the SeedSequence with the same seed
+# ss = SeedSequence(seed)
+# # Create a random number generator using the SeedSequence
+# rng = default_rng(ss)
+# _test_array_rng = [i for i in range(10)]
+# _test_array_rng = rng.permutation(_test_array_rng)
+# print(_test_array_rng)
