@@ -16,6 +16,7 @@ import numpy as np
 import threading
 from abc import ABCMeta, abstractmethod
 from time import sleep
+from numpy.random import SeedSequence, default_rng
 
 import six
 
@@ -95,18 +96,15 @@ class ConcurrentVentilator(Ventilator):
         if not isinstance(items_to_ventilate, list) or any(not isinstance(item, dict) for item in items_to_ventilate):
             raise ValueError('items_to_ventilate must be a list of dicts')
 
-        from numpy.random import SeedSequence, default_rng
-
         # Define a fixed seed value
-        seed = random_seed
         print(f"petastorm ConcurrentVentilator __init__ seed:{seed}")
-        seed = 42
+        # seed = 42
         # On each node, initialize the SeedSequence with the same seed
-        ss = SeedSequence(seed)
+        # ss = SeedSequence(random_seed)
 
 
         # Create a random number generator using the SeedSequence
-        rng = default_rng(ss)
+        rng = default_rng(SeedSequence(random_seed))
 
         import random
         random.seed (42)
@@ -171,11 +169,14 @@ class ConcurrentVentilator(Ventilator):
 
             # If we are ventilating the first item, we check if we would like to randomize the item order
             if self._current_item_to_ventilate == 0 and self._randomize_item_order and not self._shuffled_this_iteration:
-                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time b4 Shuffling {self._items_to_ventilate} self._test_array:{self._test_array} self._test_array_rng:{self._test_array_rng}")
-                self._random_state.shuffle(self._items_to_ventilate)
-                self._random_state2.shuffle(self._test_array)
-                self._test_array_rng = self._rng.permutation(self._test_array_rng)
-                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time aft Shuffling {self._items_to_ventilate} self._test_array:{self._test_array} self._test_array_rng:{self._test_array_rng}")
+                # print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time b4 Shuffling {self._items_to_ventilate} self._test_array:{self._test_array} self._test_array_rng:{self._test_array_rng}")
+                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time b4 Shuffling {self._items_to_ventilate} ")
+                # self._random_state.shuffle(self._items_to_ventilate)
+                # self._random_state2.shuffle(self._test_array)
+                # self._test_array_rng = self._rng.permutation(self._test_array_rng)
+                self._items_to_ventilate = self._rng.permutation(self._items_to_ventilate)
+                # print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time aft Shuffling {self._items_to_ventilate} self._test_array:{self._test_array} self._test_array_rng:{self._test_array_rng}")
+                print(f"petastorm ConcurrentVentilator _ventilate _current_item_to_ventilate == 0 first time aft Shuffling {self._items_to_ventilate} ")
                 self._shuffled_this_iteration = True
 
             # Block until queue has room, but use continue to allow for checking if stop has been called
